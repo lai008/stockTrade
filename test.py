@@ -3,7 +3,7 @@ import option
 import os
 
 def checkFoldPermission(path):
-    if(path == 'USER_HOME/tmp/stockholm_export'):
+    if(path == 'USER_HOME/tmp/stockholm11_export'):
         path = os.path.expanduser('~') + '/tmp/stockholm_export'
     try:
         if not os.path.exists(path):
