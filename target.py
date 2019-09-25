@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+import datetime
 import baostock as bs
 import pandas as pd
 import numpy as np
@@ -10,11 +12,77 @@ class getTarget(object):
 	"""docstring for getTarget"""
 	def __init__(self, root):
 		self.root = root
+		login_result = bs.login(user_id='anonymous', password='123456')
+		print(login_result)
+
+
+
+	def get_Colse_price(self):
+		#### 获取沪深A股历史K线数据 ####
+		# 详细指标参数，参见“历史行情指标参数”章节；“分钟线”参数与“日线”参数不同。
+		# 分钟线指标：date,time,code,open,high,low,close,volume,amount,adjustflag
+
+
+		today = datetime.datetime.now().strftime('%Y%m%d')
+		startdate = '2017-01-01'
+		enddate = f'{today[0:4]}-{today[4:6]}-{today[6:8]}'
+
+		rs = bs.query_history_k_data_plus("sz.000001",
+										  "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
+										  start_date=startdate, end_date=enddate,
+										  frequency="d", adjustflag="3")
+		#print('query_history_k_data_plus respond error_code:' + rs.error_code)
+		#print('query_history_k_data_plus respond  error_msg:' + rs.error_msg)
+
+		#### 打印结果集 ####
+		data_list = []
+		while (rs.error_code == '0') & rs.next():
+			# 获取一条记录，将记录合并在一起
+			data_list.append(rs.get_row_data())
+		result = pd.DataFrame(data_list, columns=rs.fields)
+
+		#### 结果集输出到csv文件 ####
+		result.to_csv("/Users/zou/PycharmProjects/weiyl_919/history_k_data.csv", encoding="gbk", index=False)
+		# 输出代码
+		#print(data_list[-1][1])
+		# 输出收盘价
+		#print(data_list[-1][5])
+		return float(data_list[-1][5])
+
+	def get_close(self, code, startdate, enddate, is_show, is_refresh,period):
+		login_result = bs.login(user_id='anonymous', password='123456')
+		print(login_result.error_msg)
+		# 获取股票日K线数据
+		rs = bs.query_history_k_data(code,
+									 "date,code,high,close,low,tradeStatus",
+									 start_date=startdate, end_date=enddate,
+									 frequency="d", adjustflag="3")
+
+		# 打印结果集
+		result_list = []
+
+		while (rs.error_code == '0') & rs.next():
+			# 获取一条记录，将记录合并在一起
+			result_list.append(rs.get_row_data())
+		df_init = pd.DataFrame(result_list, columns=rs.fields)
+		# 剔除停盘数据
+		df_status = df_init[df_init['tradeStatus'] == '1']
+
+		low = df_status['low'].astype(float)
+		del df_status['low']
+		df_status.insert(0, 'low', low)
+		high = df_status['high'].astype(float)
+		del df_status['high']
+		df_status.insert(0, 'high', high)
+		close = df_status['close'].astype(float)
+		del df_status['close']
+		df_status.insert(0, 'close', close)
+
+		return float(result_list[-1][3])
 
 	def computeKDJ(self, code, startdate, enddate, is_show, is_refresh,period):
 		login_result=bs.login(user_id='anonymous', password='123456')
 		print(login_result.error_msg)
-
 
 		# 获取股票日K线数据
 		rs=bs.query_history_k_data(code,
@@ -203,6 +271,8 @@ class getTarget(object):
 		# 结果集输出到csv文件
 		result.to_csv(r"/Users/zou/PycharmProjects/weiyl_919/history_Index_k_data.csv", index=False)
 		close = [float(x) for x in result['close']]
+
+
 		for item in zip(name_,fb_list):
 			result[item[0]] = ta.MA(np.array(close), timeperiod=item[1])
 		result.index = result['date']
@@ -210,6 +280,8 @@ class getTarget(object):
 
 		loc_list = range(len(result))[::period]
 		result = result.iloc[loc_list,:]
+
+
         #????????
 		print(result.iloc[600,[0]])
 
@@ -223,6 +295,12 @@ class getTarget(object):
 		# 登出系统
 		bs.logout()
 		return result
+
+	def get_MA8(self):
+		ma_list = df_ma.iloc[-1, :].tolist()
+		ma_8, ma_13, ma_21, ma_34, ma_55 = ma_list[0], ma_list[1], ma_list[2], ma_list[3], ma_list[4]
+		return float(ma_8)
+
 
 	def computeVOL(self,code,startdate,enddate,is_show, is_refresh, period):
 		# 登陆系统
@@ -263,19 +341,48 @@ class getTarget(object):
 		return result
 		
 if __name__ == '__main__':
+
+	# root = r'/Users/zou/PycharmProjects/weiyl_919/'
+	# task = getTarget(root)
+	# code = 'sz.000858'
+	# startdate = '2017-01-01'
+	# enddate = '2019-09-22'
+	# period = 1
+
+
 	root = r'/Users/zou/PycharmProjects/weiyl_919/'
 	task = getTarget(root)
+	code = 'sh.600809' \
 
-	code = 'sz.000858'
+	today = datetime.datetime.now().strftime('%Y%m%d')
 	startdate = '2017-01-01'
-	enddate = '2019-09-22'
+	enddate = f'{today[0:4]}-{today[4:6]}-{today[6:8]}'
 	period = 1
+
 	# 计算KDJ,MACD,MA,VOL,MA，最后两个参数为 是否显示图 以及 是否更新数据。
 	#df_kdj = task.computeKDJ(code,startdate,enddate,1, 1,period)
 	#(dif, dea, hist) = task.computeMACD(code, startdate, enddate, 1, 1,period)
 	#df_rsi = task.computeRSI(code, startdate, enddate,1, 1,period)
 	df_ma = task.computeMA(code, startdate, enddate,1, 1,period)
+	df_close=task.get_close(code, startdate, enddate,1, 1,period)
+	df_vol=task.computeVOL(code, startdate, enddate,1, 1,period)
+	ma_list = df_ma.iloc[-1,:].tolist()
+	ma_8,ma_13,ma_21,ma_34,ma_55 = ma_list[0],ma_list[1],ma_list[2],ma_list[3],ma_list[4]
+	# print("Ma-8：")
+	print("MA8:")
+	print(ma_8)
+	print("收盘价：")
+	print(df_close)
+	print("前一交易日收盘股价／MA8 比率:")
+	print(df_close/ma_8)
+
+	#print(getTarget(root).get_MA8())
+
+	#print(getTarget(root).get_Colse_price()/getTarget(root).get_MA8())
+
+	#print(Cloce_div_ma8)
 	#df_vol = task.computeVOL(code, startdate, enddate,1, 1,period)
 	#df_macd=task.computeMACD(code,startdate,enddate,1,1,period)
+
 
 #print(df_ma)
