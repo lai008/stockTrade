@@ -71,7 +71,8 @@ class work(QWidget):
         # sender = self.sender()
         # self.statusBar().showMessage(sender.text() + ' was pressed')
         print("启动交易")
-        autoTrade.main();
+        #autoTrade.buy();
+        autoTrade.sell(159928);
 
 
     def button_stop(self):
@@ -123,7 +124,7 @@ if __name__ == '__main__':
         #print(now_time.time().hour+":"+now_time.time().second +":"+now_time.time().second())
 
         # 系统时间16点19分00秒，触发事件 (如不触发， .second 要重新加载一下 )
-        if now_time.time().hour == 11 and now_time.time().minute == 53 and now_time.time().second == 00:
+        if now_time.time().hour == 15 and now_time.time().minute ==19 and now_time.time().second == 00:
             print('启动策略')
             ##########策略体###########
             KDJ = kdj.computeKDJ(code, startdate, enddate)
