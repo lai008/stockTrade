@@ -7,7 +7,11 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from autoTrade import autoTrade
+import datetime
+import time
+
 import target as tg
+import kdj as kdj
 import pandas as pd
 import difflib as df
 
@@ -19,10 +23,8 @@ import difflib as df
 root = r'/Users/zou/PycharmProjects/weiyl_919/'
 tg1=tg.getTarget(root)
 
-code = 'sh.000001'
-startdate = '2015-01-01'
-enddate = '2019-09-22'
-period = 1
+
+
 
 
 class work(QWidget):
@@ -60,6 +62,8 @@ class work(QWidget):
         button_start.clicked.connect(self.button_start)
         button_stop.clicked.connect(self.button_stop)
 
+
+
         self.show()
 
     # 功能设计
@@ -72,7 +76,15 @@ class work(QWidget):
 
     def button_stop(self):
         print("暂停交易")
-        tg1.computeMACD(code,startdate,enddate,1,1,period)
+    #
+    #     if J[-1] <100:
+    #         self.button_start()
+
+
+
+        # #print(tg.ma_8)
+        # tg1.computeMACD(code,startdate,enddate,1,1,period)
+        # print(tg1.get_MA8())
        # tg1.computeMA(code, startdate, enddate, 1, 1, period)
        # tg1.computeKDJ(code, startdate, enddate, 1, 1, period)
        # tg1.computeRSI(code, startdate, enddate, 1, 1, period)
@@ -92,6 +104,42 @@ class work(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = work()
+    code = 'sh.000001'
+    today = datetime.datetime.now().strftime('%Y%m%d')
+    startdate = '2017-01-01'
+    enddate = f'{today[0:4]}-{today[4:6]}-{today[6:8]}'
+    period = 1
+
+
+
+    while True:
+        now_time = datetime.datetime.now()
+        imnow = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(imnow)
+        time.sleep(1)
+        print(now_time.time().hour)
+        print(now_time.time().minute)
+        print(now_time.time().second)
+        #print(now_time.time().hour+":"+now_time.time().second +":"+now_time.time().second())
+
+        # 系统时间16点19分00秒，触发事件 (如不触发， .second 要重新加载一下 )
+        if now_time.time().hour == 11 and now_time.time().minute == 53 and now_time.time().second == 00:
+            print('启动策略')
+            ##########策略体###########
+            KDJ = kdj.computeKDJ(code, startdate, enddate)
+            J = kdj.computeKDJ(code, startdate, enddate)
+            print(J[-1])
+
+            if J[-1] < 0:
+                work.button_start(QWidget)
+
+            print("交易成功")
+            ######################
+
+
+    # 系统时间16点19分00秒，触发事件 (如不触发， .second 要重新加载一下 )
+    # if now_time.time().hour == 22 and now_time.time().minute == 51 and now_time.time().second == 00:
+    #     print('AAAAAAAAAA')
     sys.exit(app.exec_())
 
 

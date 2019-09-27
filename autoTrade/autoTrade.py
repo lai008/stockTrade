@@ -46,8 +46,8 @@ def main():
 	driver = webdriver.Chrome(os.path.join(getCurDir(), "chromedriver"))
 
 	driver.maximize_window()
-	#driver.get("https://passport2.eastmoney.com/pub/login?backurl=http%3A//www.eastmoney.com/")
-	driver.get("https://hippo.gf.com.cn/?source=STORE & needLoginTrade=true#StockTrade")
+	driver.get("https://passport2.eastmoney.com/pub/login?backurl=http%3A//www.eastmoney.com/")
+	#driver.get("https://hippo.gf.com.cn/?source=STORE & needLoginTrade=true#StockTrade")
 	wait = WebDriverWait(driver, 30, .5)
 	frame_login = wait.until(EC.presence_of_element_located((By.ID, "frame_login")))
 
@@ -107,7 +107,8 @@ def main():
 	# futcode.send_keys(Keys.DELETE)
 	time.sleep(1)
 	# driver.execute_script("arguments[0].value='600519';", futcode)
-	futcode.send_keys("159928")
+	#futcode.send_keys("159928")
+	futcode.send_keys("510500")
 	time.sleep(1)
 	futcode.send_keys(Keys.ARROW_DOWN)
 	# futcode.send_keys(Keys.ENTER)
@@ -133,7 +134,8 @@ def main():
 	driver.execute_script("arguments[0].click();", btn_kdj)
 
 	time.sleep(1)
-	futcodeNum = "159928"
+	#futcodeNum = "159928"
+	#futcodeNum = "510500"
 	beg = "20170101"
 	end = getToday
 	k_data_url = "http://42.push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.{0}&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg={1}&end={2}&ut=fa5fd1943c7b386f172d6893dbfba10b&cb=cb76085147199693".format(futcodeNum, beg, end)

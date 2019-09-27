@@ -2,6 +2,7 @@
 import baostock as bs
 import pandas as pd
 import matplotlib.pyplot as plt
+import datetime
 
 
 def computeKDJ(code, startdate, enddate):
@@ -46,10 +47,14 @@ def computeKDJ(code, startdate, enddate):
     df_data['D'] = df_data['K'].ewm(com=2).mean()
     df_data['J'] = 3 * df_data['K'] - 2 * df_data['D']
     #2019-9-24
-    # if df_data['J'] > 100 :
-    print(df_data['J'])
 
-    ########
+    #取enddate的J值
+    df_J=df_data['J'].tolist()
+    print(df_J[-1])
+
+
+
+    #
     df_data.index = df_status['date'].values
     df_data.index.name = 'date'
     # 删除空数据
@@ -66,15 +71,28 @@ def computeKDJ(code, startdate, enddate):
 
     df_data.plot(title='KDJ')
 
-    plt.show()
+    #plt.show()
     bs.logout()
-    return (df_data)
+    #return (df_data)
+    return (df_J)
 
 
-if __name__ == '__main__':
+if __name__ == '__ma' \
+               'in__':
    code = 'sz.000858'
    startdate = '2017-01-01'
-   enddate = '2019-07-01'
-   df = computeKDJ(code,startdate,enddate)
+   #enddate = '2019-08-14'
+   today = datetime.datetime.now().strftime('%Y%m%d')
+   enddate = f'{today[0:4]}-{today[4:6]}-{today[6:8]}'
+
+
+   #df = computeKDJ(code,startdate,enddate)
+   KDJ_J=computeKDJ(code,startdate,enddate)
+
+   for KDJ_J in KDJ_J:
+
+      if KDJ_J > 100:
+          print(KDJ_J)
+
    # 保存到文件中
-   df.to_csv("/Users/zou/PycharmProjects/weiyl_919/KDJ.csv", encoding='gbk')
+   #df.to_csv("/Users/zou/PycharmProjects/weiyl_919/KDJ.csv", encoding='gbk')

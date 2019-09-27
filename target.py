@@ -374,7 +374,7 @@ if __name__ == '__main__':
 	print("收盘价：")
 	print(df_close)
 	print("前一交易日收盘股价／MA8 比率:")
-	print(df_close/ma_8)   
+	print(df_close/ma_8)
 
 	#TODO 计算从 【 startdate 到 enddate 】 的所有 当天的收盘价／当天的MA8，存入一个list[]
 	#TODO 计算这个list[]的最大值，以及最小值， 求平均值
