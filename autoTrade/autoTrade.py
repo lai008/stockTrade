@@ -81,7 +81,6 @@ def buy(code):
 	#futcode.send_keys(Keys.CONTROL + "a")
 	#MAC
 	# myMouse.click(650,540,1)
-	# myKeyboard.type_string('free87878660!')
 	# myKeyboard.press_key('return')
 
 	myMouse.click(400, 500, 1)
@@ -205,7 +204,6 @@ def sell(code):
 	# futcode.send_keys(Keys.CONTROL + "a")
 	# MAC
 	# myMouse.click(650,540,1)
-	# myKeyboard.type_string('free87878660!')
 	# myKeyboard.press_key('return')
 
 	# 定位卖出
